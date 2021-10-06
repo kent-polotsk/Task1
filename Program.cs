@@ -18,7 +18,7 @@ namespace Task1
             {
                 Random value = new Random();
                 for (int month_count = 0; month_count < 12; month_count++)
-                    sw.WriteLine($"{month_count + 1}\t{value.Next(0, 1000000)}\t{value.Next(0, 1000000)}");
+                    sw.WriteLine($"{month_count + 1},{value.Next(0, 1000000)},{value.Next(0, 1000000)}");
             }
         }
 
@@ -32,23 +32,20 @@ namespace Task1
             string[,] filedata = new string[12, 3];
             using (StreamReader sr = new StreamReader(filename))
             {
+                int row = 0;
                 string line;
-                for (int row = 0; row < 12; row++)
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        string[] content = line.Split('\t', '\n').ToArray();
-                        for (int col = 0; col < 3; col++)
-                            filedata[row, col] = content[col];
-                    }
-            }
-
-            for (int row = 0; row < filedata.GetLength(0); row++)
-            {
-                for (int col = 0; col < filedata.GetLength(1); col++)
+                while ((line = sr.ReadLine()) != null)
                 {
-                    Console.Write(filedata[row, col] + " ");
+
+                    string[] content = line.Split(';');//.ToArray();
+                    Console.WriteLine(line);
+                    for (int col = 0; content.Length < 3; col++)
+                    {
+                        filedata[row, col] = content[col];
+                        Console.Write(filedata[row, col]);
+                    }
+                    row++;
                 }
-                Console.WriteLine();
             }
             return filedata;
         }
@@ -72,15 +69,15 @@ namespace Task1
                 decimdata[row, 3] = decimdata[row, 1] - decimdata[row, 2];
             }
 
-/*
-            for (int row = 0; row < decimdata.GetLength(0); row++)
-            {
-                for (int col = 0; col < decimdata.GetLength(1); col++)
-                {
-                    Console.Write(decimdata[row, col] + " ");
-                }
-                Console.WriteLine();
-            }*/
+            /*
+                        for (int row = 0; row < decimdata.GetLength(0); row++)
+                        {
+                            for (int col = 0; col < decimdata.GetLength(1); col++)
+                            {
+                                Console.Write(decimdata[row, col] + " ");
+                            }
+                            Console.WriteLine();
+                        }*/
             return decimdata;
         }
 
@@ -115,14 +112,7 @@ namespace Task1
                 string[,] str_file = ReadFromFile(filename);
                 decimal[,] dec_data = Calculate(str_file);
 
-                /*for (int row = 0; row < dec_data.GetLength(0); row++)
-                {
-                    for (int col = 0; col < dec_data.GetLength(1); col++)
-                    {
-                        Console.Write(dec_data[row, col]+" ");
-                    }
-                    Console.WriteLine();
-                }*/
+
 
                 FileWrite("1" + filename, dec_data);
 
@@ -132,7 +122,7 @@ namespace Task1
             }
             while (continue_program);
 
-
+            Console.ReadKey();
         }
     }
 }
