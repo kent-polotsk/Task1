@@ -18,7 +18,7 @@ namespace Task1
             {
                 Random value = new Random();
                 for (int month_count = 0; month_count < 12; month_count++)
-                    sw.WriteLine($"{month_count + 1},{value.Next(0, 1000000)},{value.Next(0, 1000000)}");
+                    sw.WriteLine($"{month_count + 1};{value.Next(0, 1000000)};{value.Next(0, 1000000)}");
             }
         }
 
@@ -36,14 +36,10 @@ namespace Task1
                 string line;
                 while ((line = sr.ReadLine()) != null)
                 {
-
-                    string[] content = line.Split(';');//.ToArray();
-                    Console.WriteLine(line);
-                    for (int col = 0; content.Length < 3; col++)
-                    {
+                    string[] content = line.Split(';').ToArray();
+                    for (int col = 0; col < content.Length; col++)
                         filedata[row, col] = content[col];
-                        Console.Write(filedata[row, col]);
-                    }
+
                     row++;
                 }
             }
@@ -51,33 +47,61 @@ namespace Task1
         }
 
         /// <summary>
-        /// Вычисление прибыли
+        /// Вычисление прибыли и худших месяцев
         /// </summary>
         /// <param name="stringdata"></param>
         /// <returns>decimal data array</returns>
         static decimal[,] Calculate(string[,] stringdata)
         {
+            int profit = 0;
             decimal[,] decimdata = new decimal[12, 4];
             for (int row = 0; row < 12; row++)
+            {
                 for (int col = 0; col < 3; col++)
                 {
                     decimdata[row, col] = Convert.ToDecimal(stringdata[row, col]);
                 }
-
-            for (int row = 0; row < 12; row++)
-            {
-                decimdata[row, 3] = decimdata[row, 1] - decimdata[row, 2];
+                if ((decimdata[row, 3] = decimdata[row, 1] - decimdata[row, 2]) > 0)
+                    profit++;
             }
 
-            /*
-                        for (int row = 0; row < decimdata.GetLength(0); row++)
-                        {
-                            for (int col = 0; col < decimdata.GetLength(1); col++)
-                            {
-                                Console.Write(decimdata[row, col] + " ");
-                            }
-                            Console.WriteLine();
-                        }*/
+            {
+                Console.WriteLine("============================================================");
+                Console.WriteLine("          Месяц" + "          Доход" + "         Расход" + "        Прибыль");
+                for (int i = 0; i < 12; i++)
+                {
+                    Console.WriteLine($"{decimdata[i, 0],15}{decimdata[i, 1],15}{decimdata[i, 2],15}{decimdata[i, 3],15}");
+                }
+            }
+
+            Console.WriteLine($"Худшая прибыль в месяцах:");
+
+            decimal[,] buffer_array = new decimal[decimdata.GetLength(0), decimdata.GetLength(1)];
+            for (int i = 0; i < decimdata.GetLength(0); i++)
+                for (int j = 0; j < decimdata.GetLength(1); j++)
+                    buffer_array[i, j] = decimdata[i, j];
+
+            decimal[] buffer_array2 = new decimal[12];
+            for (int i = 0; i < 12; i++)
+                buffer_array2[i] = decimdata[i, 3];
+
+            decimal min = buffer_array2.Min();
+            int counter_min = 1, counter_repeat=0;
+            while ((counter_min <= 3)&&(counter_repeat<12))
+            {
+                for (int i = 0; i < 12; i++)
+                    if (buffer_array2[i] == min)
+                    {
+                        Console.Write(" " + buffer_array[i, 0]);
+                        buffer_array2[i] = buffer_array2.Max()+1;
+                        counter_repeat++;
+                    }
+
+                min = buffer_array2.Min();
+                counter_min++;
+            }
+            Console.WriteLine();
+            Console.WriteLine($"Месяцев с положительной прибылью: {profit}");
             return decimdata;
         }
 
@@ -92,18 +116,27 @@ namespace Task1
             {
                 for (int row = 0; row < 12; row++)
                 {
-                    sw.WriteLine($"{decimdata[row, 0]}\t{decimdata[row, 1]}\t{decimdata[row, 2]}\t{decimdata[row, 3]}");
+                    sw.WriteLine($"{decimdata[row, 0]};{decimdata[row, 1]};{decimdata[row, 2]};{decimdata[row, 3]}");
                 }
             }
         }
+
 
         static void Main(string[] args)
         {
             bool continue_program = false;
             do
             {
-                Console.Write("Введите название файла: ");
-                string filename = Console.ReadLine();
+                string filename;
+                do
+                {
+                    Console.Write("Введите название файла: ");
+                    filename = Console.ReadLine();
+                    Console.WriteLine("Некорректный ввод, повторите!");
+                }
+                while (!File.Exists(filename));
+                    
+
                 Console.Write($"Заполнить файл {filename} случайными тестовыми данными (y/n)?: ");
                 string confirm = Console.ReadLine();
                 if (confirm == "y" || confirm == "Y")
@@ -112,17 +145,15 @@ namespace Task1
                 string[,] str_file = ReadFromFile(filename);
                 decimal[,] dec_data = Calculate(str_file);
 
-
-
-                FileWrite("1" + filename, dec_data);
+                FileWrite("Output_" + filename, dec_data);
 
                 Console.Write("Выполнить программу заново (y/n)?: ");
                 confirm = Console.ReadLine();
                 if (confirm == "y" || confirm == "Y") continue_program = true;
+                else continue_program = false;
             }
             while (continue_program);
 
-            Console.ReadKey();
         }
     }
 }
