@@ -127,20 +127,21 @@ namespace Task1
             bool continue_program = false;
             do
             {
-                string filename;
-                do
+                string confirm = "y";
+                string filename= "1.csv";
+               /* do
                 {
                     Console.Write("Введите название файла: ");
                     filename = Console.ReadLine();
                     Console.WriteLine("Некорректный ввод, повторите!");
                 }
                 while (!File.Exists(filename));
-                    
+                */    
 
-                Console.Write($"Заполнить файл {filename} случайными тестовыми данными (y/n)?: ");
+                /*Console.Write($"Заполнить файл {filename} случайными тестовыми данными (y/n)?: ");
                 string confirm = Console.ReadLine();
-                if (confirm == "y" || confirm == "Y")
-                    FillingFile(filename);
+                if (confirm == "y" || confirm == "Y")*/
+                  //  FillingFile(filename);
 
                 string[,] str_file = ReadFromFile(filename);
                 decimal[,] dec_data = Calculate(str_file);
